@@ -1,0 +1,1349 @@
+/* Retal Residence — company profile. A4 landscape, built on the website's tokens
+   (src/app/globals.css): the same palette, General Sans + Alexandria, one accent. */
+
+@font-face {
+  font-family: 'General Sans';
+  src: url('../../src/fonts/GeneralSans-400.woff2') format('woff2');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('../../src/fonts/GeneralSans-500.woff2') format('woff2');
+  font-weight: 500;
+}
+@font-face {
+  font-family: 'Alexandria';
+  src: url('../../src/fonts/Alexandria-Arabic.woff2') format('woff2');
+  font-weight: 400 500;
+}
+
+@page {
+  size: 297mm 210mm;
+  margin: 0;
+}
+
+:root {
+  --canvas: #f3f1eb;
+  --canvas-deep: #e9e6de;
+  --line: #d6d2c6;
+  --ink: #1a1816;
+  --ink-soft: #4d4943;
+  --ink-muted: #6b665d;
+  --night: #161412;
+  --night-raised: #1f1c19;
+  --night-line: #3a3631;
+  --bone: #efece4;
+  --bone-soft: #aca69c;
+  --copper: #a97c6a;
+  --copper-deep: #8b5d4b;
+
+  --page-w: 297mm;
+  --page-h: 210mm;
+  --m: 14mm;
+  --gap: 5mm;
+  --seam: 2.5mm;
+
+  --fs-display: 50pt;
+  --fs-h1: 40pt;
+  --fs-h2: 27pt;
+  --fs-h3: 17pt;
+  --fs-h4: 11.5pt;
+  --fs-stat: 44pt;
+  --fs-lead: 12.5pt;
+  --fs-body: 9.25pt;
+  --fs-small: 8pt;
+  --fs-micro: 6.25pt;
+
+  --lh-display: 0.94;
+  --lh-h1: 0.98;
+  --lh-h2: 1.04;
+  --lh-h3: 1.14;
+  --lh-lead: 1.42;
+  --lh-body: 1.58;
+  --ls-display: -0.045em;
+  --ls-h1: -0.04em;
+  --ls-h2: -0.032em;
+  --ls-h3: -0.02em;
+  --ls-eyebrow: 0.16em;
+
+  --font: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Arabic: Alexandria first, no negative tracking, taller lines, display a step smaller. */
+:root:lang(ar) {
+  --font: 'Alexandria', 'General Sans', 'Helvetica Neue', Arial, sans-serif;
+  --fs-display: 38pt;
+  --fs-h1: 31pt;
+  --fs-h2: 21.5pt;
+  --fs-h3: 14.5pt;
+  --fs-h4: 10.5pt;
+  --fs-lead: 11pt;
+  --fs-body: 8.75pt;
+  --lh-display: 1.22;
+  --lh-h1: 1.24;
+  --lh-h2: 1.32;
+  --lh-h3: 1.4;
+  --lh-lead: 1.75;
+  --lh-body: 1.85;
+  --ls-display: 0;
+  --ls-h1: 0;
+  --ls-h2: 0;
+  --ls-h3: 0;
+  --ls-eyebrow: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.num {
+  unicode-bidi: isolate;
+  font-family: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: 'tnum' 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Page                                                                */
+/* ------------------------------------------------------------------ */
+.page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  overflow: hidden;
+  background: var(--canvas);
+  break-after: page;
+  page-break-after: always;
+}
+.page:last-child {
+  break-after: auto;
+  page-break-after: auto;
+}
+.page--deep {
+  background: var(--canvas-deep);
+}
+.page--night {
+  background: var(--night);
+  color: var(--bone);
+  --line: var(--night-line);
+  --ink-soft: var(--bone-soft);
+  --ink-muted: var(--bone-soft);
+}
+
+/* 12-column grid inside the margins. */
+.grid {
+  position: absolute;
+  inset: var(--m);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+
+.abs {
+  position: absolute;
+}
+
+/* Photography: images bleed off the page edge or sit on the grid; never under a dark overlay. */
+.ph {
+  position: absolute;
+  overflow: hidden;
+  background: var(--canvas-deep);
+}
+.page--night .ph {
+  background: var(--night-raised);
+}
+
+/* Folio */
+.folio {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 7mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.folio b {
+  font-weight: 500;
+  color: var(--ink);
+}
+.page--night .folio b {
+  color: var(--bone);
+}
+
+/* ------------------------------------------------------------------ */
+/* Type                                                                */
+/* ------------------------------------------------------------------ */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.eyebrow::before {
+  content: '';
+  width: 6mm;
+  height: 0.3mm;
+  background: var(--copper);
+}
+.eyebrow--plain::before {
+  display: none;
+}
+:lang(ar) .eyebrow {
+  font-size: calc(var(--fs-micro) + 1pt);
+}
+
+.display {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+}
+.h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+  letter-spacing: var(--ls-h1);
+}
+.h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+}
+.h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  letter-spacing: var(--ls-h3);
+}
+.h4 {
+  font-size: var(--fs-h4);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+:lang(ar) .h4 {
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+.lead {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  color: var(--ink-soft);
+}
+.body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink-soft);
+}
+.small {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+:lang(ar) .small {
+  line-height: 1.8;
+}
+.micro {
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+:lang(ar) .micro {
+  font-size: calc(var(--fs-micro) + 1pt);
+}
+.br {
+  white-space: pre-line;
+}
+.copper {
+  color: var(--copper);
+}
+.muted {
+  color: var(--ink-muted);
+}
+.stack > * + * {
+  margin-block-start: var(--s, 5mm);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 5.2mm;
+  padding-inline: 2.6mm;
+  border: 0.25mm solid var(--line);
+  border-radius: 999px;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+:lang(ar) .pill {
+  letter-spacing: 0;
+  font-size: calc(var(--fs-micro) + 0.75pt);
+}
+.pill--copper {
+  border-color: var(--copper);
+  color: var(--copper-deep);
+}
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6mm;
+}
+
+.rule {
+  border: 0;
+  border-top: 0.25mm solid var(--line);
+}
+
+/* Hairline list: 01  Title */
+.hl {
+  list-style: none;
+  border-top: 0.25mm solid var(--line);
+}
+.hl li {
+  display: flex;
+  align-items: baseline;
+  gap: 4mm;
+  padding-block: 2.2mm;
+  border-bottom: 0.25mm solid var(--line);
+}
+.hl .n {
+  flex: none;
+  width: 6mm;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+  color: var(--copper);
+}
+
+/* ------------------------------------------------------------------ */
+/* Logo                                                                */
+/* ------------------------------------------------------------------ */
+.logo {
+  display: block;
+  height: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* 01 Cover                                                            */
+/* ------------------------------------------------------------------ */
+.cover__img {
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 150mm;
+}
+.cover__logo {
+  position: absolute;
+  top: var(--m);
+  inset-inline-start: var(--m);
+  width: 50mm;
+}
+.cover__title {
+  position: absolute;
+  inset-inline-start: var(--m);
+  bottom: 22mm;
+  width: 124mm;
+}
+.cover__title .display {
+  font-size: 41pt;
+}
+.cover__meta {
+  position: absolute;
+  inset-inline-start: var(--m);
+  bottom: 9mm;
+  width: 122mm;
+  display: flex;
+  justify-content: space-between;
+}
+:lang(ar) .cover__title .display {
+  font-size: 33pt;
+}
+
+/* ------------------------------------------------------------------ */
+/* 02 Contents                                                         */
+/* ------------------------------------------------------------------ */
+.contents__img {
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 104mm;
+}
+.contents__body {
+  position: absolute;
+  inset-inline-start: calc(104mm + 16mm);
+  inset-inline-end: var(--m);
+  top: var(--m);
+  bottom: 20mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.toc {
+  list-style: none;
+  border-top: 0.25mm solid var(--line);
+}
+.toc li {
+  display: grid;
+  grid-template-columns: 14mm 1fr auto;
+  align-items: baseline;
+  padding-block: 3.1mm 3.3mm;
+  border-bottom: 0.25mm solid var(--line);
+}
+.toc .n {
+  font-size: var(--fs-small);
+  color: var(--copper);
+}
+.toc .t {
+  font-size: 19pt;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+:lang(ar) .toc .t {
+  font-size: 15.5pt;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+.toc .p {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* 03 Statement                                                        */
+/* ------------------------------------------------------------------ */
+.statement__text {
+  grid-column: 1 / span 9;
+  grid-row: 2;
+  align-self: start;
+  margin-block-start: 12mm;
+  font-size: 32pt;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+:lang(ar) .statement__text {
+  font-size: 23pt;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+.statement__img {
+  top: 0;
+  inset-inline-end: 0;
+  width: 62mm;
+  height: 92mm;
+}
+.principles {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 22mm;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: var(--gap);
+}
+.principles > div {
+  border-top: 0.25mm solid var(--ink);
+  padding-block-start: 4mm;
+  padding-inline-end: 8mm;
+}
+.principles .n {
+  font-size: var(--fs-micro);
+  color: var(--copper);
+  letter-spacing: 0.06em;
+  margin-block-end: 6mm;
+}
+
+/* ------------------------------------------------------------------ */
+/* Full-bleed photo with a solid caption panel                         */
+/* ------------------------------------------------------------------ */
+.bleed {
+  inset: 0;
+}
+.caption-panel {
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: 0;
+  width: 106mm;
+  padding: 9mm var(--m) 11mm;
+  background: var(--canvas);
+}
+.page--night .caption-panel,
+.caption-panel--night {
+  background: var(--night);
+  color: var(--bone);
+  --ink-soft: var(--bone-soft);
+  --ink-muted: var(--bone-soft);
+}
+.caption-panel--end {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Numbers                                                             */
+/* ------------------------------------------------------------------ */
+.numbers__head {
+  position: absolute;
+  top: var(--m);
+  inset-inline: var(--m);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: var(--gap);
+}
+.numbers__grid {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 22mm;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: var(--gap);
+  row-gap: 11mm;
+}
+.stat {
+  border-top: 0.25mm solid var(--line);
+  padding-block-start: 4mm;
+}
+.stat__v {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5mm;
+  white-space: nowrap;
+  font-size: var(--fs-stat);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+}
+.stat__v .u {
+  font-size: 13pt;
+  letter-spacing: 0;
+  color: var(--copper);
+}
+.stat__l {
+  margin-block-start: 3mm;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+:lang(ar) .stat__l {
+  line-height: 1.75;
+}
+
+/* ------------------------------------------------------------------ */
+/* Chapter opener (text + edge-bleeding image)                         */
+/* ------------------------------------------------------------------ */
+.opener__img {
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 150mm;
+}
+.opener__text {
+  position: absolute;
+  top: var(--m);
+  bottom: 20mm;
+  inset-inline-start: var(--m);
+  width: 115mm;
+  display: flex;
+  flex-direction: column;
+}
+.chapter-no {
+  font-size: 9pt;
+  color: var(--copper);
+  letter-spacing: 0.04em;
+}
+.included {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--gap);
+  margin-block-start: auto;
+}
+.included li {
+  list-style: none;
+  padding-block: 2.6mm;
+  border-top: 0.25mm solid var(--line);
+  font-size: var(--fs-small);
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ */
+/* Who Retal is for                                                    */
+/* ------------------------------------------------------------------ */
+.aud {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 20mm;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: var(--gap);
+}
+.aud__img {
+  height: 58mm;
+  overflow: hidden;
+  background: var(--canvas-deep);
+}
+.aud__label {
+  display: flex;
+  gap: 2.5mm;
+  align-items: baseline;
+  margin-block: 3.5mm 2mm;
+  padding-block-start: 2.5mm;
+  border-top: 0.25mm solid var(--ink);
+  font-size: var(--fs-micro);
+}
+.aud__figs {
+  list-style: none;
+  margin-block-start: 3mm;
+  border-top: 0.25mm solid var(--line);
+}
+.aud__figs li {
+  display: grid;
+  grid-template-columns: 22mm 1fr;
+  align-items: baseline;
+  padding-block: 1.6mm;
+  border-bottom: 0.25mm solid var(--line);
+  font-size: var(--fs-micro);
+  color: var(--ink-soft);
+}
+.aud__figs b {
+  font-size: 12pt;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.aud__figs small {
+  font-size: 6.5pt;
+  color: var(--copper-deep);
+}
+:lang(ar) .aud__figs li {
+  font-size: calc(var(--fs-micro) + 1pt);
+}
+
+/* ------------------------------------------------------------------ */
+/* Residence table                                                     */
+/* ------------------------------------------------------------------ */
+.table {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 20mm;
+  width: calc(100% - 2 * var(--m));
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+}
+.table th {
+  text-align: start;
+  font-weight: 500;
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding-block-end: 2.5mm;
+  border-bottom: 0.25mm solid var(--ink);
+}
+:lang(ar) .table th {
+  font-size: calc(var(--fs-micro) + 1pt);
+}
+.table td {
+  padding-block: 2mm;
+  border-bottom: 0.25mm solid var(--line);
+  vertical-align: middle;
+  color: var(--ink-soft);
+}
+.table td.name {
+  font-size: 11pt;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+:lang(ar) .table td.name {
+  font-size: 10pt;
+  letter-spacing: 0;
+}
+.table .thumb {
+  width: 23mm;
+  height: 14mm;
+  overflow: hidden;
+}
+.table .idx {
+  color: var(--copper);
+  font-size: var(--fs-micro);
+  width: 9mm;
+  padding-inline-start: 4mm;
+}
+.table .fig {
+  font-size: 11pt;
+  color: var(--ink);
+}
+.unit {
+  font-size: var(--fs-micro);
+  color: var(--ink-muted);
+  margin-inline-start: 0.6mm;
+}
+.table .go {
+  text-align: end;
+  color: var(--ink-muted);
+  font-size: var(--fs-micro);
+}
+
+/* ------------------------------------------------------------------ */
+/* Residence page                                                      */
+/* ------------------------------------------------------------------ */
+.res__main {
+  top: 0;
+  inset-inline-start: 0;
+  width: 160mm;
+  height: 127mm;
+}
+.res__a,
+.res__b {
+  bottom: 0;
+  height: calc(var(--page-h) - 127mm - var(--seam));
+  width: calc((160mm - var(--seam)) / 2);
+}
+.res__a {
+  inset-inline-start: 0;
+}
+.res__b {
+  inset-inline-start: calc((160mm + var(--seam)) / 2);
+}
+.res--flip .res__main,
+.res--flip .res__a {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+.res--flip .res__b {
+  inset-inline-start: auto;
+  inset-inline-end: calc((160mm + var(--seam)) / 2);
+}
+.res__text {
+  position: absolute;
+  top: var(--m);
+  bottom: 18mm;
+  inset-inline-start: calc(160mm + 11mm);
+  inset-inline-end: var(--m);
+  display: flex;
+  flex-direction: column;
+}
+.res--flip .res__text {
+  inset-inline-start: var(--m);
+  inset-inline-end: calc(160mm + 11mm);
+}
+.res__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.res__name {
+  margin-block-start: 6mm;
+}
+.res__summary {
+  margin-block-start: 2.5mm;
+  font-size: 10.5pt;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+:lang(ar) .res__summary {
+  font-size: 9.5pt;
+  line-height: 1.7;
+}
+.specs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-block-start: 5mm;
+  border-top: 0.25mm solid var(--ink);
+}
+.specs > div {
+  padding-block: 2.6mm 0;
+  padding-inline-end: 2mm;
+}
+.specs > div + div {
+  border-inline-start: 0.25mm solid var(--line);
+  padding-inline-start: 2.6mm;
+}
+.specs .v {
+  font-size: 17pt;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.specs .v small {
+  font-size: 8pt;
+  letter-spacing: 0;
+  color: var(--copper);
+  margin-inline-start: 0.8mm;
+}
+.specs .k {
+  margin-block-start: 1.6mm;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+:lang(ar) .specs .k {
+  letter-spacing: 0;
+  font-size: calc(var(--fs-micro) + 0.75pt);
+}
+.res__desc {
+  margin-block-start: 4.5mm;
+}
+.res__extras {
+  margin-block-start: 3.5mm;
+}
+.plan {
+  position: relative;
+  flex: 1;
+  min-height: 62mm;
+  margin-block-start: 6mm;
+  background: var(--canvas-deep);
+  padding: 4mm 4mm 7mm;
+}
+.plan img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+.plan__label {
+  position: absolute;
+  bottom: 2.2mm;
+  inset-inline-start: 4mm;
+}
+.plan .links {
+  position: absolute;
+  bottom: 2.2mm;
+  inset-inline-end: 4mm;
+  display: flex;
+  gap: 4mm;
+}
+.links a {
+  color: var(--copper-deep);
+  border-bottom: 0.2mm solid currentColor;
+}
+
+/* ------------------------------------------------------------------ */
+/* Clubhouse opener                                                    */
+/* ------------------------------------------------------------------ */
+.club__img {
+  top: 0;
+  inset-inline: 0;
+  height: 122mm;
+}
+.club__text {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 20mm;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: var(--gap);
+  align-items: end;
+}
+.figs {
+  display: flex;
+  gap: 7mm;
+}
+.figs .v {
+  font-size: 28pt;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+.figs .l {
+  margin-block-start: 2mm;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  max-width: 24mm;
+}
+:lang(ar) .figs .l {
+  letter-spacing: 0;
+  font-size: calc(var(--fs-micro) + 1pt);
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ */
+/* Clubhouse category                                                  */
+/* ------------------------------------------------------------------ */
+.cat__text {
+  position: absolute;
+  top: var(--m);
+  bottom: 20mm;
+  inset-inline-start: var(--m);
+  width: 84mm;
+  display: flex;
+  flex-direction: column;
+}
+.cat--flip .cat__text {
+  inset-inline-start: auto;
+  inset-inline-end: var(--m);
+}
+.cat__lead {
+  top: 0;
+  inset-inline-end: 0;
+  width: 185mm;
+  height: 122mm;
+}
+.cat__row {
+  bottom: 0;
+  height: calc(var(--page-h) - 122mm - var(--seam));
+  width: calc((185mm - 2 * var(--seam)) / 3);
+}
+.cat__row--1 {
+  inset-inline-end: 0;
+}
+.cat__row--2 {
+  inset-inline-end: calc((185mm - 2 * var(--seam)) / 3 + var(--seam));
+}
+.cat__row--3 {
+  inset-inline-end: calc(2 * (185mm - 2 * var(--seam)) / 3 + 2 * var(--seam));
+}
+.cat--flip .cat__lead {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+}
+.cat--flip .cat__row--1 {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+}
+.cat--flip .cat__row--2 {
+  inset-inline-end: auto;
+  inset-inline-start: calc((185mm - 2 * var(--seam)) / 3 + var(--seam));
+}
+.cat--flip .cat__row--3 {
+  inset-inline-end: auto;
+  inset-inline-start: calc(2 * (185mm - 2 * var(--seam)) / 3 + 2 * var(--seam));
+}
+.cat__big-n {
+  font-size: 64pt;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  font-weight: 500;
+  color: var(--copper);
+}
+.cat__list {
+  margin-block-start: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* 360 tour                                                            */
+/* ------------------------------------------------------------------ */
+.tour__head {
+  position: absolute;
+  top: var(--m);
+  inset-inline-start: var(--m);
+  width: 92mm;
+}
+.tour__rooms {
+  position: absolute;
+  top: var(--m);
+  inset-inline-start: calc(var(--m) + 106mm);
+  inset-inline-end: var(--m);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: var(--gap);
+}
+.tour__rooms ol {
+  list-style: none;
+  border-top: 0.25mm solid var(--ink);
+  margin-block-start: 2.5mm;
+}
+.tour__rooms li {
+  display: flex;
+  gap: 2.5mm;
+  padding-block: 1.45mm;
+  border-bottom: 0.25mm solid var(--line);
+  font-size: var(--fs-small);
+  line-height: 1.3;
+}
+.tour__rooms li span {
+  flex: none;
+  width: 5mm;
+  font-size: var(--fs-micro);
+  color: var(--copper);
+  padding-block-start: 0.4mm;
+}
+.tour__strip {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 82mm;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--seam);
+}
+.tour__strip figure {
+  position: relative;
+  overflow: hidden;
+  background: var(--canvas-deep);
+}
+.tour__strip figcaption {
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  padding: 1.2mm 2.2mm;
+  background: var(--canvas);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+:lang(ar) .tour__strip figcaption {
+  letter-spacing: 0;
+  font-size: calc(var(--fs-micro) + 1pt);
+}
+
+/* ------------------------------------------------------------------ */
+/* Living                                                              */
+/* ------------------------------------------------------------------ */
+.living__head {
+  position: absolute;
+  top: var(--m);
+  inset-inline: var(--m);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: var(--gap);
+  align-items: end;
+}
+.themes {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 20mm;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: var(--gap);
+}
+.theme__img {
+  position: relative;
+  height: 62mm;
+  overflow: hidden;
+  background: var(--canvas-deep);
+}
+.theme__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-block-start: 4mm;
+  padding-block-start: 2.5mm;
+  border-top: 0.25mm solid var(--ink);
+}
+.theme__fact {
+  font-size: 10pt;
+  font-weight: 500;
+  color: var(--copper-deep);
+}
+.theme h3 {
+  margin-block-start: 3mm;
+}
+
+/* ------------------------------------------------------------------ */
+/* Outdoors / security / location / visit                             */
+/* ------------------------------------------------------------------ */
+.split-img {
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: var(--w, 168mm);
+}
+.split-text {
+  position: absolute;
+  top: var(--m);
+  bottom: 20mm;
+  inset-inline-start: calc(var(--w, 168mm) + 12mm);
+  inset-inline-end: var(--m);
+  display: flex;
+  flex-direction: column;
+}
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--seam);
+  height: 70mm;
+  margin-block-start: auto;
+}
+.pair > div {
+  position: relative;
+  overflow: hidden;
+}
+
+.sec__guard {
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 96mm;
+}
+.sec__check {
+  bottom: 0;
+  inset-inline-end: 0;
+  width: 78mm;
+  height: 106mm;
+}
+.sec__head {
+  position: absolute;
+  top: var(--m);
+  inset-inline-start: calc(96mm + 12mm);
+  inset-inline-end: var(--m);
+}
+.sec__list {
+  position: absolute;
+  bottom: 20mm;
+  inset-inline-start: calc(96mm + 12mm);
+  width: 82mm;
+}
+.sec__list li {
+  font-size: 11pt;
+  font-weight: 500;
+  padding-block: 2.6mm;
+}
+:lang(ar) .sec__list li {
+  font-size: 10pt;
+}
+
+.map {
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 168mm;
+  background: var(--canvas-deep);
+}
+.map__inner {
+  position: absolute;
+  inset: 0;
+  direction: ltr;
+}
+.pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.pin i {
+  position: absolute;
+  left: -1.2mm;
+  top: -1.2mm;
+  width: 2.4mm;
+  height: 2.4mm;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 0.5mm solid var(--canvas);
+}
+.pin span {
+  position: absolute;
+  top: -2.1mm;
+  left: 2.6mm;
+  white-space: nowrap;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--canvas);
+  padding: 0.5mm 1.4mm;
+}
+:lang(ar) .pin span {
+  letter-spacing: 0;
+  font-size: calc(var(--fs-micro) + 1pt);
+}
+.pin--left span {
+  left: auto;
+  right: 2.6mm;
+}
+.pin--home i {
+  left: -2.2mm;
+  top: -2.2mm;
+  width: 4.4mm;
+  height: 4.4mm;
+  background: var(--copper);
+  box-shadow: 0 0 0 1.6mm rgba(169, 124, 106, 0.22);
+}
+.pin--home span {
+  top: -2.6mm;
+  left: 4.4mm;
+  background: var(--ink);
+  color: var(--bone);
+  padding: 0.9mm 2mm;
+}
+.pin--home.pin--left span {
+  left: auto;
+  right: 4.4mm;
+}
+.area {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+:lang(ar) .area {
+  letter-spacing: 0;
+  font-size: calc(var(--fs-micro) + 1.5pt);
+}
+.drive li {
+  display: grid;
+  grid-template-columns: 19mm 1fr;
+  align-items: baseline;
+  padding-block: 1.9mm;
+}
+.drive .m {
+  font-size: 15pt;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+.drive .m small {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+  color: var(--copper);
+  margin-inline-start: 0.8mm;
+}
+:lang(ar) .drive .m small {
+  font-size: calc(var(--fs-micro) + 1pt);
+  letter-spacing: 0;
+}
+
+.mosaic {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  top: 48mm;
+  display: grid;
+  grid-template-columns: 1.55fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--seam);
+}
+.mosaic > div {
+  position: relative;
+  overflow: hidden;
+}
+.mosaic .tall {
+  grid-row: span 2;
+}
+.mosaic .wide {
+  grid-column: span 2;
+}
+.gallery__head {
+  position: absolute;
+  top: var(--m);
+  inset-inline: var(--m);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: var(--gap);
+  align-items: start;
+}
+
+.visit__img {
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 82mm;
+}
+.visit__body {
+  position: absolute;
+  top: var(--m);
+  bottom: 18mm;
+  inset-inline-start: var(--m);
+  inset-inline-end: calc(82mm + 14mm);
+  display: flex;
+  flex-direction: column;
+}
+.contacts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: var(--gap);
+  margin-block-start: auto;
+}
+.contacts > div {
+  border-top: 0.25mm solid var(--line);
+  padding-block-start: 3mm;
+}
+.contacts .micro {
+  margin-block-end: 3mm;
+}
+.contacts p {
+  font-size: var(--fs-small);
+  line-height: 1.6;
+}
+.contacts p + .micro {
+  margin-block-start: 3.5mm;
+}
+.contacts a {
+  color: var(--bone);
+}
+
+.back__mark {
+  position: absolute;
+  top: var(--m);
+  inset-inline-start: var(--m);
+  width: 13mm;
+}
+.back__foot {
+  position: absolute;
+  inset-inline: var(--m);
+  bottom: 13mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+/* ------------------------------------------------------------------ */
+/* On screen: pages stacked and scaled to fit the window               */
+/* ------------------------------------------------------------------ */
+@media screen {
+  html {
+    background: #2a2723;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6mm;
+    padding-block: 6mm;
+    zoom: var(--fit, 1);
+  }
+  body.shot {
+    padding: 0;
+    gap: 0;
+  }
+}
+@media print {
+  body {
+    zoom: 1;
+  }
+}

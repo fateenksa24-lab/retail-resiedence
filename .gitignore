@@ -1,0 +1,30 @@
+# raw client files — never committed
+/_raw-assets/
+
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# env
+.env*
+!.env.example
+
+# misc
+.DS_Store
+npm-debug.log*
+/.lighthouse/
+/.cache/
+/screenshots/
+/.next-build/
+
+# documents kept out of the repo (the SEO report and template stay in)
+/*.pdf
+!/Retal-SEO-Report.pdf
+!/fateen-template.pdf
+/Gemini_Generated_Image_*.jpg
+/profile/**/*.pdf

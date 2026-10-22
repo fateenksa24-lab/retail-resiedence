@@ -1,0 +1,39 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.retalresidence.com" }],
+      "destination": "https://retalresidence.com/:path*",
+      "permanent": true
+    },
+    { "source": "/contact{/}?", "destination": "/en/contact/", "permanent": true },
+    { "source": "/the-building{/}?", "destination": "/en/residences/", "permanent": true },
+    { "source": "/ipanorama/virtualtour/:path*", "destination": "/en/clubhouse/", "permanent": true },
+    { "source": "/retal-residence-francais{/}?", "destination": "/fr/", "permanent": true },
+    { "source": "/retal-residence-italiano{/}?", "destination": "/it/", "permanent": true },
+    { "source": "/retal-residence-aragones{/}?", "destination": "/es/", "permanent": true },
+    { "source": "/:page(about|faq|blog|landingpage){/}?", "destination": "/en/", "permanent": true },
+    { "source": "/:file(wp-sitemap.*\\.xml)", "destination": "/sitemap.xml", "permanent": true },
+    {
+      "source": "/",
+      "has": [{ "type": "header", "key": "accept-language", "value": "(?<lang>ar|fr|it|es|zh|ko).*" }],
+      "destination": "/:lang/",
+      "permanent": false
+    },
+    { "source": "/", "destination": "/en/", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}
