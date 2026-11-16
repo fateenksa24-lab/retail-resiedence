@@ -19,7 +19,9 @@ import { Link } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
 import { breadcrumbJsonLd, JsonLd, localePath, pageMetadata } from '@/lib/seo';
 
-export const dynamicParams = false;
+// Not `dynamicParams = false`: it stops admin saves (on-demand revalidation) from regenerating
+// these pages. Unknown slugs 404 through notFound() below; force-static keeps that render static.
+export const dynamic = 'force-static';
 
 export function generateStaticParams() {
   return residences.map((r) => ({ slug: r.slug }));

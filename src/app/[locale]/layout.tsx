@@ -10,6 +10,7 @@ import { MotionProvider } from '@/components/motion/MotionProvider';
 import { Analytics } from '@/components/layout/Analytics';
 import { SITE_URL } from '@/content/contact';
 import { tracking } from '@/content/tracking';
+import { clientSiteSettings } from '@/lib/cms/content';
 import { dirFor, routing } from '@/i18n/routing';
 import { JsonLd, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import { generalSans, alexandria } from '../fonts';
@@ -57,6 +58,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   // Residence descriptions are rendered on the server; the client only needs labels.
   clientMessages.residences = { ...residences, items: undefined };
   const t = await getTranslations('nav');
+  const settings = clientSiteSettings();
 
   return (
     <html lang={locale} dir={dirFor(locale)} className={`${generalSans.variable} ${alexandria.variable}`}>
@@ -70,12 +72,12 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
               {t('skip')}
             </a>
             <SmoothScroll />
-            <Header />
+            <Header settings={settings} />
             <main id="main" tabIndex={-1} className="outline-none">
               {children}
             </main>
             <Footer />
-            <WhatsAppButton />
+            <WhatsAppButton href={settings.whatsapp.href} />
           </MotionProvider>
         </NextIntlClientProvider>
         <JsonLd data={organizationJsonLd()} />

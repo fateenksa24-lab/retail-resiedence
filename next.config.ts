@@ -12,7 +12,8 @@ const nextConfig: NextConfig = {
   // public/contact.php. On Vercel it is a regular build: redirects and headers live in vercel.json,
   // and the form posts to a function (src/app/api/contact/route.vercel.ts).
   output: onVercel ? undefined : 'export',
-  pageExtensions: onVercel ? ['tsx', 'ts', 'vercel.ts'] : ['tsx', 'ts'],
+  // `.vercel.tsx` holds the admin (CMS), which needs a server.
+  pageExtensions: onVercel ? ['tsx', 'ts', 'vercel.ts', 'vercel.tsx'] : ['tsx', 'ts'],
   env: { NEXT_PUBLIC_ENQUIRY_ENDPOINT: onVercel ? '/api/contact/' : '/contact.php' },
   trailingSlash: true,
   reactStrictMode: true,
@@ -32,6 +33,8 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
     optimizePackageImports: ['motion', 'motion/react', 'framer-motion'],
+    // Admin image uploads (already compressed in the browser); Vercel caps request bodies at 4.5 MB.
+    serverActions: { bodySizeLimit: '4mb' },
   },
 };
 

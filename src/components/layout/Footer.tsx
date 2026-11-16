@@ -3,6 +3,7 @@ import { Logo } from '@/components/brand/Logo';
 import { RevealLines } from '@/components/motion/RevealLines';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { contact, social } from '@/content/contact';
+import { currentLogo } from '@/lib/cms/content';
 import { DIRECTIONS_URL } from '@/content/neighborhood';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -111,7 +112,7 @@ export async function Footer() {
 
         <div className="mt-section-sm flex flex-col gap-6 border-t border-night-line pt-8 text-micro text-bone-soft md:flex-row md:items-center md:justify-between">
           <Link href="/" className="inline-flex text-bone">
-            <Logo className="h-12 w-auto" />
+            <Logo className="h-12 w-auto" custom={currentLogo().onDark ?? currentLogo().onLight} />
           </Link>
           <p>{t('rights', { year: new Date().getFullYear() })}</p>
         </div>

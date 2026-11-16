@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Arrow } from '@/components/ui/Arrow';
 import { buttonClass } from '@/components/ui/ButtonLink';
-import { bookingDays, bookingInterestNames, bookingInterests, bookingSlots, bookingWhatsApp, type BookingInterest } from '@/content/booking';
+import { bookingDays, bookingInterestNames, bookingInterests, bookingSlots, type BookingInterest } from '@/content/booking';
 import { trackLead } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 import { DUR, EASE_OUT } from '@/lib/motion';
@@ -63,7 +63,7 @@ const chip = (on: boolean) =>
 
 // Pick any day and time, say what to see, add a name and number: "Book" opens WhatsApp to the
 // reservations team with the whole booking written out, ready to send.
-export function BookingForm({ labels }: { labels: BookingLabels }) {
+export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whatsapp: string }) {
   const locale = useLocale();
   const mounted = useSyncExternalStore(noop, () => true, () => false);
   const today = mounted ? todayIso() : '';
@@ -176,7 +176,7 @@ export function BookingForm({ labels }: { labels: BookingLabels }) {
       '───────────────',
       `_retalresidence.com  ·  ${language}_`,
     ].join('\n');
-    const url = `https://wa.me/${bookingWhatsApp}?text=${encodeURIComponent(text)}`;
+    const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
     setLink(url);
     trackLead('booking_whatsapp', { interests: interests.join(',') || undefined });
     window.open(url, '_blank', 'noopener');

@@ -35,6 +35,7 @@ export async function BookingPanel() {
 
         <div className="col-span-4 min-w-0 md:col-span-6 lg:col-span-8">
           <BookingForm
+            whatsapp={contact.whatsapp.href.replace(/\D/g, '')}
             labels={{
               day: t('day'),
               otherDate: t('otherDate'),

@@ -3,6 +3,7 @@ import { SITE_URL } from '@/content/contact';
 import { getImage, type ImageId } from '@/content/images';
 import { residences } from '@/content/residences';
 import { routing } from '@/i18n/routing';
+import { loadCms } from '@/lib/cms/content';
 import { localePath } from '@/lib/seo';
 
 export const dynamic = 'force-static';
@@ -19,7 +20,8 @@ const pages: [string, ImageId[]][] = [
   ['/contact', ['site/gate-sign-dusk']],
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  await loadCms();
   const now = new Date();
   return pages.flatMap(([path, images]) =>
     routing.locales.map((locale) => ({

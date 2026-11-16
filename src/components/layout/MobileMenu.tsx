@@ -4,17 +4,17 @@ import { AnimatePresence, m } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { buttonClass } from '@/components/ui/ButtonLink';
-import { contact } from '@/content/contact';
 import { Link, usePathname } from '@/i18n/navigation';
 import { lockScroll } from '@/lib/lenis';
 import { DUR, EASE_OUT, STAGGER } from '@/lib/motion';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { navItems } from './nav-items';
 
-type Props = { open: boolean; onClose: () => void };
+type ContactLink = { display: string; href: string };
+type Props = { open: boolean; onClose: () => void; phone: ContactLink; whatsapp: ContactLink };
 
 // Full-screen menu for phones and tablets: large type, contact details at the foot.
-export function MobileMenu({ open, onClose }: Props) {
+export function MobileMenu({ open, onClose, phone, whatsapp }: Props) {
   const t = useTranslations('nav');
   const pathname = usePathname();
   const panel = useRef<HTMLDivElement>(null);
@@ -98,10 +98,10 @@ export function MobileMenu({ open, onClose }: Props) {
               {t('cta')}
             </Link>
             <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-small">
-              <a href={contact.phone.href} className="inline-flex min-h-tap items-center tabular" dir="ltr">
-                {contact.phone.display}
+              <a href={phone.href} className="inline-flex min-h-tap items-center tabular" dir="ltr">
+                {phone.display}
               </a>
-              <a href={contact.whatsapp.href} className="inline-flex min-h-tap items-center" target="_blank" rel="noopener noreferrer">
+              <a href={whatsapp.href} className="inline-flex min-h-tap items-center" target="_blank" rel="noopener noreferrer">
                 {t('whatsapp')}
               </a>
             </div>

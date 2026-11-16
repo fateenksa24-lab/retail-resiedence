@@ -1,3 +1,4 @@
+import type { CmsImage } from '@/lib/cms/types';
 import { MARK, WORD } from './logo-paths';
 
 type Props = {
@@ -5,11 +6,17 @@ type Props = {
   /** Show only the calligraphic mark. */
   markOnly?: boolean;
   title?: string;
+  /** A logo uploaded in the admin, used instead of the built-in lockup. */
+  custom?: CmsImage;
 };
 
 // Horizontal lockup: copper mark, then the RETAL wordmark and a small RESIDENCE line
 // in currentColor so the logo follows light and dark sections.
-export function Logo({ className, markOnly, title = 'Retal Residence' }: Props) {
+export function Logo({ className, markOnly, title = 'Retal Residence', custom }: Props) {
+  if (custom && !markOnly) {
+    // eslint-disable-next-line @next/next/no-img-element -- small logo file, served as uploaded
+    return <img src={custom.src} width={custom.width} height={custom.height} alt={title} className={className} />;
+  }
   if (markOnly) {
     return (
       <svg viewBox="0 0 51 119" className={className} role="img" aria-label={title}>

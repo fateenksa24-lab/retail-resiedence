@@ -2,11 +2,10 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { contact } from '@/content/contact';
 import { cn } from '@/lib/cn';
 
 // Small, quiet, and only after the visitor starts scrolling. Sits at the inline end, so it mirrors in RTL.
-export function WhatsAppButton() {
+export function WhatsAppButton({ href }: { href: string }) {
   const t = useTranslations('nav');
   const [shown, setShown] = useState(false);
 
@@ -24,7 +23,7 @@ export function WhatsAppButton() {
 
   return (
     <a
-      href={contact.whatsapp.href}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t('whatsappLabel')}

@@ -21,6 +21,7 @@ npm-debug.log*
 /.cache/
 /screenshots/
 /.next-build/
+/.next-admin/
 
 # documents kept out of the repo (the SEO report and template stay in)
 /*.pdf
@@ -28,3 +29,6 @@ npm-debug.log*
 !/fateen-template.pdf
 /Gemini_Generated_Image_*.jpg
 /profile/**/*.pdf
+
+# CMS content saved in local development
+/.cms/

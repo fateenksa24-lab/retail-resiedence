@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Logo } from '@/components/brand/Logo';
 import { buttonClass } from '@/components/ui/ButtonLink';
 import { Link, usePathname } from '@/i18n/navigation';
+import type { SiteSettings } from '@/lib/cms/content';
 import { cn } from '@/lib/cn';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { navItems, overlayHeroes } from './nav-items';
@@ -16,7 +17,7 @@ const MobileMenu = dynamic(() => import('./MobileMenu').then((mod) => mod.Mobile
 const SOLID_AFTER = 24;
 const HIDE_AFTER = 320;
 
-export function Header() {
+export function Header({ settings }: { settings: SiteSettings }) {
   const t = useTranslations('nav');
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -72,7 +73,10 @@ export function Header() {
       >
         <div className="page-x flex h-header items-center justify-between gap-6">
           <Link href="/" className="-ms-1 flex min-h-tap items-center p-1" onClick={() => setMenuOpen(false)}>
-            <Logo className="h-10 w-auto" />
+            <Logo
+              className="h-10 w-auto"
+              custom={overlayTone === 'dark' ? (settings.logo.onLight ?? settings.logo.onDark) : (settings.logo.onDark ?? settings.logo.onLight)}
+            />
           </Link>
 
           <nav aria-label={t('primary')} className="hidden items-center gap-8 lg:flex">
@@ -134,7 +138,7 @@ export function Header() {
           </div>
         </div>
       </header>
-      {menuLoaded && <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />}
+      {menuLoaded && <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} phone={settings.phone} whatsapp={settings.whatsapp} />}
     </>
   );
 }

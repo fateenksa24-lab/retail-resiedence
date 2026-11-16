@@ -17,6 +17,3 @@ export const bookingInterestNames: Record<BookingInterest, string> = {
   'executive-villa': 'Executive villas',
   clubhouse: 'The Clubhouse',
 };
-
-/** The company WhatsApp number that receives bookings (international format, digits only). */
-export const bookingWhatsApp = '966562416136';
