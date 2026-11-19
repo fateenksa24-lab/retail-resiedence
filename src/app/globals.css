@@ -148,7 +148,7 @@
   --text-display: clamp(2.5rem, 0.9rem + 5.4vw, 7.25rem);
   --text-h1: clamp(2.25rem, 1rem + 3.6vw, 5rem);
   --text-h2: clamp(1.875rem, 1rem + 2.5vw, 3.75rem);
-  --lh-display: 1.14;
+  --lh-display: 1.35;
   --ls-display: 0;
   --lh-h1: 1.18;
   --ls-h1: 0;
@@ -338,16 +338,25 @@ html.lenis body {
   overflow: hidden;
   padding-bottom: 0.12em;
   margin-bottom: -0.12em;
+
+  /* Arabic: room above and below the clip for shadda and the dots under ي. */
+  &:lang(ar) {
+    padding-block: 0.35em;
+    margin-block: -0.35em;
+  }
 }
 
 /* Hero intro: runs on first paint, before hydration. */
 @keyframes rise {
   from {
-    transform: translateY(110%);
+    transform: translateY(var(--rise-from, 110%));
   }
   to {
     transform: none;
   }
+}
+:root:lang(ar) {
+  --rise-from: 160%;
 }
 @keyframes fade-up {
   from {

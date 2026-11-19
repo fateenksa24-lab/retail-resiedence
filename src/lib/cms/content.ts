@@ -90,7 +90,8 @@ export async function readContentFresh(): Promise<CmsContent> {
  * before it renders, so components keep importing their data as before.
  */
 export async function loadCms(): Promise<CmsContent> {
-  current = await readCached();
+  // Content cached before a field existed lacks it; fill the gaps with empty defaults.
+  current = { ...emptyContent(), ...(await readCached()) };
   apply(current);
   return current;
 }
