@@ -288,6 +288,7 @@
         "time": "Please choose a time.",
         "name": "Please enter your name.",
         "phone": "Please enter a valid phone number.",
+        "dayClosed": "We are closed on Fridays. Please choose another day.",
         "timePast": "Please choose a time later than now."
       },
       "otherDate": "Other date",

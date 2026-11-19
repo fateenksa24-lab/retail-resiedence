@@ -288,6 +288,7 @@
         "time": "Elija una hora.",
         "name": "Introduzca su nombre.",
         "phone": "Introduzca un teléfono válido.",
+        "dayClosed": "Los viernes estamos cerrados. Elija otro día.",
         "timePast": "Elija una hora posterior a la actual."
       },
       "otherDate": "Otra fecha",

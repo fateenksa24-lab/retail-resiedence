@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Arrow } from '@/components/ui/Arrow';
 import { buttonClass } from '@/components/ui/ButtonLink';
-import { bookingDays, bookingInterestNames, bookingInterests, bookingSlots, type BookingInterest } from '@/content/booking';
+import { bookingClosedDays, bookingDays, bookingInterestNames, bookingInterests, bookingSlots, bookingSlotsByWeekday, type BookingInterest } from '@/content/booking';
 import { trackLead } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 import { DUR, EASE_OUT } from '@/lib/motion';
@@ -31,7 +31,7 @@ export type BookingLabels = {
   sentBody: string;
   sentAgain: string;
   sentReset: string;
-  errors: { day: string; time: string; timePast: string; name: string; phone: string };
+  errors: { day: string; dayClosed: string; time: string; timePast: string; name: string; phone: string };
 };
 
 type Field = 'day' | 'time' | 'name' | 'phone';
@@ -46,6 +46,8 @@ const isoDate = (iso: string) => {
   const [y, mo, d] = iso.split('-').map(Number) as [number, number, number];
   return new Date(Date.UTC(y, mo - 1, d, 12));
 };
+const isClosed = (iso: string) => bookingClosedDays.includes(isoDate(iso).getUTCDay());
+const slotsFor = (iso: string | null) => (iso && bookingSlotsByWeekday[isoDate(iso).getUTCDay()]) || bookingSlots;
 /** Minutes past midnight in Al Khobar right now. */
 function nowMinutes() {
   const [h, min] = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
@@ -70,11 +72,13 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
   const days = useMemo(
     () =>
       today
-        ? Array.from({ length: bookingDays }, (_, i) => {
+        ? Array.from({ length: bookingDays + 7 }, (_, i) => {
             const d = isoDate(today);
             d.setUTCDate(d.getUTCDate() + i);
             return d.toISOString().slice(0, 10);
           })
+            .filter((iso) => !isClosed(iso))
+            .slice(0, bookingDays)
         : [],
     [today],
   );
@@ -88,6 +92,15 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<Field[]>([]);
   const [pastTime, setPastTime] = useState(false);
+  const [closedPick, setClosedPick] = useState(false);
+  const slots = slotsFor(day);
+  /** Choose a day; a slot the new day doesn't offer is cleared. */
+  const pickDay = (iso: string) => {
+    setDay(iso);
+    setClosedPick(false);
+    clear('day');
+    if (hour !== null && !slotsFor(iso).includes(hour)) setHour(null);
+  };
   const [link, setLink] = useState<string | null>(null);
 
   const rail = useRef<HTMLDivElement>(null);
@@ -185,7 +198,7 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
   const error = (f: Field) =>
     errors.includes(f) ? (
       <p id={`booking-${f}-error`} className="mt-2 text-small text-copper-deep" role="alert">
-        {f === 'time' && pastTime ? labels.errors.timePast : labels.errors[f]}
+        {f === 'time' && pastTime ? labels.errors.timePast : f === 'day' && closedPick ? labels.errors.dayClosed : labels.errors[f]}
       </p>
     ) : null;
   const legend = 'mb-3 flex min-h-tap w-full items-center justify-between gap-4 text-small font-medium';
@@ -254,10 +267,7 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
                           key={iso}
                           type="button"
                           aria-pressed={on}
-                          onClick={() => {
-                            setDay(iso);
-                            clear('day');
-                          }}
+                          onClick={() => pickDay(iso)}
                           className={cn(chip(on), 'w-16 shrink-0 snap-start flex-col gap-0.5 py-2.5')}
                         >
                           <span className={cn('text-micro', on ? 'text-canvas/70' : 'text-ink-muted')}>{i === 0 ? labels.today : fmt(iso, { weekday: 'short' })}</span>
@@ -281,8 +291,14 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
                     onClick={() => dateInput.current?.showPicker?.()}
                     onChange={(e) => {
                       if (!e.target.value) return;
-                      setDay(e.target.value);
-                      clear('day');
+                      // The native calendar can't grey out Fridays, so say so instead.
+                      if (isClosed(e.target.value)) {
+                        setDay(null);
+                        setClosedPick(true);
+                        setErrors((v) => [...new Set<Field>([...v, 'day'])]);
+                        return;
+                      }
+                      pickDay(e.target.value);
                     }}
                     className="absolute inset-0 size-full cursor-pointer opacity-0"
                     aria-label={labels.otherDate}
@@ -296,7 +312,7 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
             <fieldset className="min-w-0" aria-describedby={errors.includes('time') ? 'booking-time-error' : undefined}>
               <legend className={legend}>{step('02', labels.time)}</legend>
               <div className="grid grid-cols-3 gap-2">
-                {bookingSlots.map((h) => (
+                {slots.map((h) => (
                   <button
                     key={h}
                     type="button"

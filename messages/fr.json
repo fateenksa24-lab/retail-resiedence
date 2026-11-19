@@ -288,6 +288,7 @@
         "time": "Veuillez choisir une heure.",
         "name": "Veuillez indiquer votre nom.",
         "phone": "Veuillez indiquer un numéro valide.",
+        "dayClosed": "Nous sommes fermés le vendredi. Veuillez choisir un autre jour.",
         "timePast": "Veuillez choisir une heure plus tardive."
       },
       "otherDate": "Autre date",
