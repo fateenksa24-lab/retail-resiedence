@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { CountUp } from '@/components/motion/CountUp';
 import { Reveal } from '@/components/motion/Reveal';
 
 const stats = ['types', 'size', 'security', 'school'] as const;
@@ -19,9 +20,7 @@ export async function Stats() {
             >
               <dt className="order-2 max-w-3xs text-small text-ink-soft">{t(`${key}.label`)}</dt>
               <dd className="order-1 flex flex-wrap items-baseline gap-x-2">
-                <span className="tabular whitespace-nowrap text-stat font-medium" dir="ltr">
-                  {t(`${key}.value`)}
-                </span>
+                <CountUp value={t(`${key}.value`)} className="tabular whitespace-nowrap text-stat font-medium" />
                 {unit && <span className="text-h4 font-medium text-ink-muted">{unit}</span>}
               </dd>
             </Reveal>
