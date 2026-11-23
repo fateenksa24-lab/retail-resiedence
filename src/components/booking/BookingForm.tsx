@@ -119,6 +119,7 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
 
   const rail = useRef<HTMLDivElement>(null);
   const dateInput = useRef<HTMLInputElement>(null);
+  const honeypot = useRef<HTMLInputElement>(null);
   const [edges, setEdges] = useState({ start: false, end: false });
 
   // Show the arrows only when there is more of the day row to reach in that direction.
@@ -190,7 +191,7 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
       const status = await fetch(ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ day, hour, name: name.trim(), phone: phone.trim(), interests, locale }),
+        body: JSON.stringify({ day, hour, name: name.trim(), phone: phone.trim(), interests, locale, company: honeypot.current?.value || undefined }),
       })
         .then((r) => r.status)
         .catch(() => 0);
@@ -445,6 +446,8 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
               <p className={cn('mb-4 text-body', summary ? 'font-medium' : 'text-ink-muted')} aria-live="polite">
                 {summary || labels.summaryEmpty}
               </p>
+              {/* Honeypot: hidden from people, filled in by bots. */}
+              <input ref={honeypot} name="company" tabIndex={-1} autoComplete="off" aria-hidden className="sr-only" />
               <button
                 type="submit"
                 aria-busy={sending || undefined}

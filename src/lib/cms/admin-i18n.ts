@@ -51,6 +51,7 @@ const en = {
     residences: 'Residences & drive times',
     logo: 'Logo',
     history: 'History',
+    bookings: 'Bookings',
   },
   sectionsLabel: 'Sections',
 
@@ -291,6 +292,22 @@ const en = {
     startOverButton: 'Load the original website',
   },
 
+  bookings: {
+    title: 'Visit bookings',
+    intro:
+      'A time is booked as soon as a visitor sends their request to WhatsApp, and other visitors then see it greyed out. If a visit is cancelled or the request never arrived, free the time so it can be booked again.',
+    empty: 'No upcoming bookings.',
+    refresh: 'Refresh',
+    loading: 'Loading…',
+    free: 'Free this time',
+    freeing: 'Freeing…',
+    confirmFree: (when: string) => `Free ${when}? Visitors will be able to book this time again.`,
+    booked: (when: string) => `Booked ${when}`,
+    whatsapp: 'WhatsApp',
+    interests: { apartment: 'Apartments', 'town-villa': 'Town villas', 'executive-villa': 'Executive villas', clubhouse: 'The Clubhouse' } as Record<string, string>,
+    notDecided: 'Not decided yet',
+  },
+
   server: {
     notConnected: 'Storage is not connected. Add a Vercel Blob store to the project.',
     invalidField: (path: string, message: string) => `Please check “${path}”: ${message}.`,
@@ -305,6 +322,7 @@ const en = {
     fileSize: 'The file is larger than 4 MB.',
     uploadFailed: 'Upload failed. Try again.',
     versionMissing: 'That version could not be opened.',
+    bookingsFailed: 'Bookings could not be loaded. Try again.',
   },
 };
 
@@ -346,6 +364,7 @@ const ar: AdminDict = {
     residences: 'الوحدات ومسافات القيادة',
     logo: 'الشعار',
     history: 'السجل',
+    bookings: 'الحجوزات',
   },
   sectionsLabel: 'الأقسام',
 
@@ -625,6 +644,22 @@ const ar: AdminDict = {
     startOverButton: 'تحميل الموقع الأصلي',
   },
 
+  bookings: {
+    title: 'حجوزات الزيارات',
+    intro:
+      'يُحجز الوقت بمجرد أن يرسل الزائر طلبه إلى واتساب، ويظهر بعدها رماديًا لبقية الزوار. إن أُلغيت الزيارة أو لم يصل الطلب، حرّر الوقت ليُحجز من جديد.',
+    empty: 'لا توجد حجوزات قادمة.',
+    refresh: 'تحديث',
+    loading: 'جارٍ التحميل…',
+    free: 'تحرير هذا الوقت',
+    freeing: 'جارٍ التحرير…',
+    confirmFree: (when: string) => `تحرير موعد ${when}؟ سيتمكن الزوار من حجز هذا الوقت مجددًا.`,
+    booked: (when: string) => `حُجز في ${when}`,
+    whatsapp: 'واتساب',
+    interests: { apartment: 'الشقق', 'town-villa': 'فلل تاون هاوس', 'executive-villa': 'الفلل التنفيذية', clubhouse: 'النادي' } as Record<string, string>,
+    notDecided: 'لم يحدد بعد',
+  },
+
   server: {
     notConnected: 'مساحة التخزين غير مربوطة. أضف مساحة Vercel Blob إلى المشروع.',
     invalidField: (path: string, message: string) => `يرجى مراجعة «${path}»: ${message}.`,
@@ -639,6 +674,7 @@ const ar: AdminDict = {
     fileSize: 'حجم الملف أكبر من 4 ميغابايت.',
     uploadFailed: 'تعذّر الرفع. حاول مرة أخرى.',
     versionMissing: 'تعذّر فتح هذه النسخة.',
+    bookingsFailed: 'تعذّر تحميل الحجوزات. حاول مرة أخرى.',
   },
 };
 

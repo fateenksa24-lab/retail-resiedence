@@ -92,32 +92,34 @@ export async function getMedia(key: string): Promise<{ body: BodyInit; contentTy
 }
 
 // Visit bookings: one small file per taken slot (cms/bookings/2026-11-24T10.json). Writing
-// never overwrites, so two people can't take the same slot.
+// never overwrites, so two people can't take the same slot. Two marker folders keep the abuse
+// limits cheap to check: cms/booking-phones/<digits>/<slot> and cms/booking-ips/<hash>/<time>.
 const BOOKINGS = 'cms/bookings/';
+const PHONES = 'cms/booking-phones/';
+const IPS = 'cms/booking-ips/';
+const SLOT = /^\d{4}-\d{2}-\d{2}T\d{2}$/;
 
-/** Keys of every taken slot ("2026-11-24T10"). */
-export async function listBookedSlots(): Promise<string[]> {
+/** Names (without .json) of the files under a prefix. */
+async function listNames(prefix: string): Promise<string[]> {
   let names: string[] = [];
   if (blobEnabled()) {
     let cursor: string | undefined;
     do {
-      const page = await list({ prefix: BOOKINGS, limit: 1000, cursor });
-      names.push(...page.blobs.map((b) => b.pathname.slice(BOOKINGS.length)));
+      const page = await list({ prefix, limit: 1000, cursor });
+      names.push(...page.blobs.map((b) => b.pathname.slice(prefix.length)));
       cursor = page.hasMore ? page.cursor : undefined;
     } while (cursor);
   } else if (localEnabled()) {
-    names = await readdir(localPath(BOOKINGS)).catch(() => []);
+    names = await readdir(localPath(prefix)).catch(() => []);
   }
   return names.filter((n) => n.endsWith('.json')).map((n) => n.slice(0, -5));
 }
 
-/** Takes a slot; false when someone already has it. */
-export async function reserveSlot(key: string, data: unknown): Promise<boolean> {
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}$/.test(key)) throw new Error('Invalid slot');
-  const body = JSON.stringify(data);
+/** Writes a new file; false when it already exists. */
+async function putNew(key: string, body: string): Promise<boolean> {
   if (blobEnabled()) {
     try {
-      await put(`${BOOKINGS}${key}.json`, body, { access: 'private', contentType: 'application/json', addRandomSuffix: false, allowOverwrite: false });
+      await put(key, body, { access: 'private', contentType: 'application/json', addRandomSuffix: false, allowOverwrite: false });
       return true;
     } catch (error) {
       if (error instanceof Error && /already exists/i.test(error.message)) return false;
@@ -125,9 +127,9 @@ export async function reserveSlot(key: string, data: unknown): Promise<boolean> 
     }
   }
   if (localEnabled()) {
-    await mkdir(localPath(BOOKINGS), { recursive: true });
+    await mkdir(path.dirname(localPath(key)), { recursive: true });
     try {
-      await writeFile(localPath(`${BOOKINGS}${key}.json`), body, { flag: 'wx' });
+      await writeFile(localPath(key), body, { flag: 'wx' });
       return true;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false;
@@ -135,6 +137,84 @@ export async function reserveSlot(key: string, data: unknown): Promise<boolean> 
     }
   }
   throw new Error('Storage is not connected.');
+}
+
+async function readJson(key: string): Promise<unknown> {
+  if (blobEnabled()) {
+    const res = await get(key, { access: 'private', useCache: false });
+    if (!res || res.statusCode !== 200) return null;
+    return JSON.parse(await new Response(res.stream).text());
+  }
+  if (localEnabled()) {
+    try {
+      return JSON.parse(await readFile(localPath(key), 'utf8'));
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+async function remove(keys: string[]): Promise<void> {
+  if (!keys.length) return;
+  if (blobEnabled()) await del(keys);
+  else if (localEnabled()) await Promise.all(keys.map((k) => rm(localPath(k), { force: true })));
+}
+
+export type Booking = { key: string; day: string; hour: number; name: string; phone: string; interests: string[]; locale: string; bookedAt: string };
+
+/** Keys of every taken slot ("2026-11-24T10"). */
+export const listBookedSlots = () => listNames(BOOKINGS);
+
+/** Takes a slot; false when someone already has it. */
+export async function reserveSlot(key: string, booking: Omit<Booking, 'key'>): Promise<boolean> {
+  if (!SLOT.test(key)) throw new Error('Invalid slot');
+  const ok = await putNew(`${BOOKINGS}${key}.json`, JSON.stringify(booking));
+  const digits = booking.phone.replace(/\D/g, '');
+  if (ok && digits) await putNew(`${PHONES}${digits}/${key}.json`, '{}').catch(() => undefined);
+  return ok;
+}
+
+/** Slots this phone number holds from `fromDay` on. */
+export async function countPhoneBookings(phone: string, fromDay: string): Promise<number> {
+  const digits = phone.replace(/\D/g, '');
+  if (!digits) return 0;
+  return (await listNames(`${PHONES}${digits}/`)).filter((k) => k.slice(0, 10) >= fromDay).length;
+}
+
+/** Records one booking attempt from this visitor and returns how many they made in the last hour. */
+export async function noteAttempt(visitor: string): Promise<number> {
+  const prefix = `${IPS}${visitor}/`;
+  const now = Date.now();
+  const times = (await listNames(prefix)).map(Number).filter(Number.isFinite);
+  const old = times.filter((t) => now - t > 3_600_000);
+  await remove(old.map((t) => `${prefix}${t}.json`)).catch(() => undefined);
+  await putNew(`${prefix}${now}.json`, '{}').catch(() => undefined);
+  return times.length - old.length + 1;
+}
+
+/** Bookings from `fromDay` on, soonest first (admin). */
+export async function listBookings(fromDay: string): Promise<Booking[]> {
+  const keys = (await listNames(BOOKINGS)).filter((k) => SLOT.test(k) && k.slice(0, 10) >= fromDay).sort();
+  const rows = await Promise.all(keys.map(async (key) => ({ key, data: (await readJson(`${BOOKINGS}${key}.json`)) as Partial<Booking> | null })));
+  return rows.map(({ key, data }) => ({
+    key,
+    day: key.slice(0, 10),
+    hour: Number(key.slice(11)),
+    name: String(data?.name ?? ''),
+    phone: String(data?.phone ?? ''),
+    interests: Array.isArray(data?.interests) ? data.interests.map(String) : [],
+    locale: String(data?.locale ?? ''),
+    bookedAt: String(data?.bookedAt ?? ''),
+  }));
+}
+
+/** Frees a slot so visitors can book it again (admin). */
+export async function releaseSlot(key: string): Promise<void> {
+  if (!SLOT.test(key)) throw new Error('Invalid slot');
+  const data = (await readJson(`${BOOKINGS}${key}.json`)) as Partial<Booking> | null;
+  const digits = String(data?.phone ?? '').replace(/\D/g, '');
+  await remove([`${BOOKINGS}${key}.json`, ...(digits ? [`${PHONES}${digits}/${key}.json`] : [])]);
 }
 
 /** Saved versions, newest first. */

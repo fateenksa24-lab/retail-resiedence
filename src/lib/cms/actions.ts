@@ -16,7 +16,8 @@ import {
 } from './content';
 import { flattenMessages } from './flatten';
 import { adminT } from './lang-server';
-import { putMedia, readVersion, storageReady, writeContentJson, writeVersion } from './storage';
+import { bookingToday } from '@/content/booking';
+import { listBookings, putMedia, readVersion, releaseSlot, storageReady, writeContentJson, writeVersion, type Booking } from './storage';
 import { cmsContentSchema, messageTokens, type CmsContent } from './types';
 
 const SESSION_EXPIRED = 'session-expired';
@@ -174,4 +175,31 @@ export async function loadVersion(key: string): Promise<VersionResult> {
   if (!(await isAdmin())) return { ok: false, error: SESSION_EXPIRED };
   const parsed = cmsContentSchema.safeParse(await readVersion(key));
   return parsed.success ? { ok: true, content: parsed.data } : { ok: false, error: (await adminT()).server.versionMissing };
+}
+
+export type BookingsResult = { ok: true; bookings: Booking[] } | { ok: false; error: string };
+
+/** Upcoming visit bookings, soonest first. */
+export async function loadBookings(): Promise<BookingsResult> {
+  if (!(await isAdmin())) return { ok: false, error: SESSION_EXPIRED };
+  const t = (await adminT()).server;
+  if (!storageReady()) return { ok: false, error: t.notConnected };
+  try {
+    return { ok: true, bookings: await listBookings(bookingToday()) };
+  } catch (error) {
+    console.error('[cms] could not list bookings', error);
+    return { ok: false, error: t.bookingsFailed };
+  }
+}
+
+/** Frees a booked slot so visitors can book it again. */
+export async function freeBooking(key: string): Promise<BookingsResult> {
+  if (!(await isAdmin())) return { ok: false, error: SESSION_EXPIRED };
+  try {
+    await releaseSlot(key);
+  } catch (error) {
+    console.error('[cms] could not free slot', error);
+    return { ok: false, error: (await adminT()).server.bookingsFailed };
+  }
+  return loadBookings();
 }

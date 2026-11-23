@@ -10,6 +10,7 @@ import { cn } from '@/lib/cn';
 import { CONTACT_KINDS, contactProblem, ContactPanel, ResidencesPanel } from './DetailsPanels';
 import { ImageError, prepareLogo, preparePhoto, toCmsImage } from './image-tools';
 import { LangSwitch, useAdmin } from './lang';
+import { BookingsPanel } from './BookingsPanel';
 import { HistoryPanel, LogoPanel } from './OtherPanels';
 import { PhotosPanel } from './PhotosPanel';
 import type { AdminData, Update } from './shared';
@@ -18,8 +19,8 @@ import { textProblem, TextPanel } from './TextPanel';
 
 export type { AdminData } from './shared';
 
-type Tab = 'text' | 'photos' | 'contact' | 'residences' | 'logo' | 'history';
-const TABS: Tab[] = ['text', 'photos', 'contact', 'residences', 'logo', 'history'];
+type Tab = 'text' | 'photos' | 'contact' | 'residences' | 'logo' | 'history' | 'bookings';
+const TABS: Tab[] = ['text', 'photos', 'contact', 'residences', 'logo', 'history', 'bookings'];
 
 const DRAFT_KEY = 'retal-cms-draft-v1';
 const WELCOME_KEY = 'retal-cms-welcome-v1';
@@ -403,6 +404,7 @@ export function AdminEditor({ data }: { data: AdminData }) {
         {tab === 'contact' && <ContactPanel data={data} draft={draft} update={update} />}
         {tab === 'residences' && <ResidencesPanel data={data} draft={draft} update={update} />}
         {tab === 'logo' && <LogoPanel draft={draft} update={update} upload={upload} />}
+        {tab === 'bookings' && <BookingsPanel requestLogin={requestLogin} />}
         {tab === 'history' && (
           <HistoryPanel versions={versions} current={saved.updatedAt} onOpen={openVersion} onStartOver={startOver} loading={loadingVersion} />
         )}
