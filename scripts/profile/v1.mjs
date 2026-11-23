@@ -399,7 +399,7 @@ function render(locale) {
   const catPhotos = {
     dining: ['clubhouse/lobby', 'clubhouse/mini-market', 'tour/restaurant', 'clubhouse/laundry'],
     family: ['clubhouse/cinema', 'clubhouse/bowling-portrait', 'clubhouse/billiards-portrait', 'tour/library'],
-    sport: ['clubhouse/pool-terrace', 'clubhouse/gym', 'tour/indoor-pool', 'clubhouse/tennis-sunset'],
+    sport: ['clubhouse/pool-terrace', 'clubhouse/gym', 'tour/indoor-pool', 'clubhouse/tennis-night'],
   };
   amenityCategories.forEach((cat, i) => {
     const [lead, p1, p2, p3] = catPhotos[cat.key];

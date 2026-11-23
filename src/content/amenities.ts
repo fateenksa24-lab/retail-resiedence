@@ -31,7 +31,7 @@ export const amenityCategories: AmenityCategory[] = [
     amenities: ['tennis', 'gym', 'pools', 'kidsPool', 'hall'],
     lead: 'clubhouse/pool-night',
     portraits: ['clubhouse/gym', 'clubhouse/gym-weights', 'clubhouse/pool-reflection'],
-    closing: 'clubhouse/tennis-sunset',
+    closing: 'clubhouse/tennis-night',
   },
 ];
 

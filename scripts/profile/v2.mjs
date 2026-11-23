@@ -551,7 +551,7 @@ function render(locale) {
     `<div class="tri">
       <figure style="inset-inline-start:0;top:0;bottom:34mm">${img('clubhouse/pool-reflection')}</figure>
       <figure style="inset-inline-start:${(triW + 2.5).toFixed(2)}mm;top:24mm;bottom:0">${img('clubhouse/gym')}</figure>
-      <figure style="inset-inline-start:${(2 * (triW + 2.5)).toFixed(2)}mm;top:0;bottom:0">${img('clubhouse/tennis-sunset', '70% 50%')}</figure>
+      <figure style="inset-inline-start:${(2 * (triW + 2.5)).toFixed(2)}mm;top:0;bottom:0">${img('clubhouse/tennis-night', '70% 50%')}</figure>
     </div>
     <div class="abs" style="top:var(--m);bottom:18mm;inset-inline-start:var(--m);width:78mm;display:flex;flex-direction:column">
       <p class="eyebrow">${esc(m.clubhouse.categories.sport.title)}</p>

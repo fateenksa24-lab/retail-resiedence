@@ -61,7 +61,7 @@ export const images = [
   { id: 'clubhouse/pool-reflection', dir: CLUB, file: '6I1A9257-HDR.jpg', hero: true },
   { id: 'clubhouse/pool-terrace', dir: CLUB, file: '6I1A9245-HDR.jpg', hero: true },
   { id: 'clubhouse/pool-umbrellas', dir: CLUB, file: '6I1A9239-HDR.jpg', hero: true },
-  { id: 'clubhouse/tennis-sunset', dir: OUT, file: '6I1A8778-HDR-Edit.jpg', hero: true },
+  { id: 'clubhouse/tennis-night', dir: '_added-assets', root: true, file: 'tennis-court-night.webp', hero: true },
 
   // Everyday life
   { id: 'living/playground', dir: OUT, file: '6I1A8815.jpg', hero: true, og: 'living' },

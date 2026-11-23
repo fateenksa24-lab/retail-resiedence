@@ -13,7 +13,7 @@ const pages: [string, ImageId[]][] = [
   ['/', ['site/aerial-compound-dusk', 'clubhouse/pool-night']],
   ['/residences', residences.map((r) => r.cover)],
   ...residences.map((r): [string, ImageId[]] => [`/residences/${r.slug}`, [...new Set([r.cover, ...r.gallery.slice(0, 5), r.plan])]]),
-  ['/clubhouse', ['clubhouse/facade-night-wide', 'clubhouse/tennis-sunset', 'clubhouse/bowling-portrait']],
+  ['/clubhouse', ['clubhouse/facade-night-wide', 'clubhouse/tennis-night', 'clubhouse/bowling-portrait']],
   ['/living', ['living/playground', 'living/kids-zone-dusk']],
   ['/neighborhood', ['site/aerial-compound-dusk']],
   ['/book', []],

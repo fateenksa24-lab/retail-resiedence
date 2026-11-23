@@ -18,7 +18,7 @@ import { complexJsonLd, JsonLd, pageMetadata } from '@/lib/seo';
 // Blocks of four: a large landscape, a wide landscape, then two portraits (see GalleryBand).
 const gallery: [ImageId, ImageId, ImageId, ImageId][] = [
   ['site/aerial-clubhouse-courtyard', 'site/street-dusk', 'residences/3br-town-villa/living-portrait', 'site/street-palms-portrait'],
-  ['clubhouse/tennis-sunset', 'residences/3br-town-villa/dining', 'clubhouse/bowling-portrait', 'living/kids-zone-dusk'],
+  ['clubhouse/tennis-night', 'residences/3br-town-villa/dining', 'clubhouse/bowling-portrait', 'living/kids-zone-dusk'],
 ];
 
 export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {

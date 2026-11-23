@@ -268,12 +268,12 @@
     "blurDataURL": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAADwAQCdASoQAAsAA4BaJaACdAED7Q7pB2AA/qNy09R/Wp9fHkltK7+z2Xh/qGSnoaD0jBihYjtmOKO3cBCb/AvzVoCIBEThJl8o1WdTJf81kmOt6L07EgAA",
     "hash": "71c8c7173fb3"
   },
-  "clubhouse/tennis-sunset": {
-    "src": "/images/clubhouse/tennis-sunset.jpg",
-    "width": 2560,
-    "height": 1707,
-    "blurDataURL": "data:image/webp;base64,UklGRkYAAABXRUJQVlA4IDoAAADwAQCdASoQAAsAA4BaJQBOgB6I4lnt4AAA/IlK0tHnqMfTXYc9D+4GF2N0hUjz5yUaWAkUpZihnwAA",
-    "hash": "1a9766bb3306"
+  "clubhouse/tennis-night": {
+    "src": "/images/clubhouse/tennis-night.jpg",
+    "width": 1600,
+    "height": 900,
+    "blurDataURL": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAAAQAgCdASoQAAkAA4BaJbACdAEPh4Ui3GigAP7s9VNDsf/xXDxKnlxO/2UvsR956vd0sAIZhTCbs7izXZ0ZqB3P/SFwNSJj/RJ0nAAA",
+    "hash": "336a8c22d079"
   },
   "living/playground": {
     "src": "/images/living/playground.jpg",
