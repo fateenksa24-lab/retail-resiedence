@@ -91,6 +91,52 @@ export async function getMedia(key: string): Promise<{ body: BodyInit; contentTy
   return null;
 }
 
+// Visit bookings: one small file per taken slot (cms/bookings/2026-11-24T10.json). Writing
+// never overwrites, so two people can't take the same slot.
+const BOOKINGS = 'cms/bookings/';
+
+/** Keys of every taken slot ("2026-11-24T10"). */
+export async function listBookedSlots(): Promise<string[]> {
+  let names: string[] = [];
+  if (blobEnabled()) {
+    let cursor: string | undefined;
+    do {
+      const page = await list({ prefix: BOOKINGS, limit: 1000, cursor });
+      names.push(...page.blobs.map((b) => b.pathname.slice(BOOKINGS.length)));
+      cursor = page.hasMore ? page.cursor : undefined;
+    } while (cursor);
+  } else if (localEnabled()) {
+    names = await readdir(localPath(BOOKINGS)).catch(() => []);
+  }
+  return names.filter((n) => n.endsWith('.json')).map((n) => n.slice(0, -5));
+}
+
+/** Takes a slot; false when someone already has it. */
+export async function reserveSlot(key: string, data: unknown): Promise<boolean> {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}$/.test(key)) throw new Error('Invalid slot');
+  const body = JSON.stringify(data);
+  if (blobEnabled()) {
+    try {
+      await put(`${BOOKINGS}${key}.json`, body, { access: 'private', contentType: 'application/json', addRandomSuffix: false, allowOverwrite: false });
+      return true;
+    } catch (error) {
+      if (error instanceof Error && /already exists/i.test(error.message)) return false;
+      throw error;
+    }
+  }
+  if (localEnabled()) {
+    await mkdir(localPath(BOOKINGS), { recursive: true });
+    try {
+      await writeFile(localPath(`${BOOKINGS}${key}.json`), body, { flag: 'wx' });
+      return true;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false;
+      throw error;
+    }
+  }
+  throw new Error('Storage is not connected.');
+}
+
 /** Saved versions, newest first. */
 export type Version = { key: string; savedAt: string };
 

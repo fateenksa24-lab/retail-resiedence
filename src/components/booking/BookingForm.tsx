@@ -5,7 +5,18 @@ import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Arrow } from '@/components/ui/Arrow';
 import { buttonClass } from '@/components/ui/ButtonLink';
-import { bookingClosedDays, bookingDays, bookingInterestNames, bookingInterests, bookingSlots, bookingSlotsByWeekday, type BookingInterest } from '@/content/booking';
+import {
+  bookingDate as isoDate,
+  bookingDays,
+  bookingInterestNames,
+  bookingInterests,
+  bookingNowMinutes as nowMinutes,
+  bookingToday as todayIso,
+  isClosedDay as isClosed,
+  slotKey,
+  slotsForDay as slotsFor,
+  type BookingInterest,
+} from '@/content/booking';
 import { trackLead } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 import { DUR, EASE_OUT } from '@/lib/motion';
@@ -31,30 +42,23 @@ export type BookingLabels = {
   sentBody: string;
   sentAgain: string;
   sentReset: string;
-  errors: { day: string; dayClosed: string; time: string; timePast: string; name: string; phone: string };
+  errors: { day: string; dayClosed: string; time: string; timePast: string; timeTaken: string; name: string; phone: string };
 };
 
 type Field = 'day' | 'time' | 'name' | 'phone';
 
-const TZ = 'Asia/Riyadh';
 const noop = () => () => {};
+/** Taken slots live on the server (Vercel only); empty on static hosting. */
+const ENDPOINT = process.env.NEXT_PUBLIC_BOOKING_ENDPOINT ?? '';
 
-/** Today in Al Khobar as YYYY-MM-DD (never the build machine's clock). */
-const todayIso = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date());
-/** A calendar date as a Date at noon UTC, so formatting never slips a day. */
-const isoDate = (iso: string) => {
-  const [y, mo, d] = iso.split('-').map(Number) as [number, number, number];
-  return new Date(Date.UTC(y, mo - 1, d, 12));
-};
-const isClosed = (iso: string) => bookingClosedDays.includes(isoDate(iso).getUTCDay());
-const slotsFor = (iso: string | null) => (iso && bookingSlotsByWeekday[isoDate(iso).getUTCDay()]) || bookingSlots;
-/** Minutes past midnight in Al Khobar right now. */
-function nowMinutes() {
-  const [h, min] = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-    .format(new Date())
-    .split(':')
-    .map(Number) as [number, number];
-  return h * 60 + min;
+async function fetchTaken(): Promise<string[]> {
+  if (!ENDPOINT) return [];
+  try {
+    const res = await fetch(ENDPOINT, { cache: 'no-store' });
+    return res.ok ? ((await res.json()) as { taken: string[] }).taken : [];
+  } catch {
+    return [];
+  }
 }
 
 const chip = (on: boolean) =>
@@ -93,13 +97,23 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
   const [errors, setErrors] = useState<Field[]>([]);
   const [pastTime, setPastTime] = useState(false);
   const [closedPick, setClosedPick] = useState(false);
+  const [takenError, setTakenError] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [taken, setTaken] = useState<Set<string>>(() => new Set());
+  useEffect(() => {
+    let live = true;
+    fetchTaken().then((keys) => live && setTaken(new Set(keys)));
+    return () => {
+      live = false;
+    };
+  }, []);
   const slots = slotsFor(day);
   /** Choose a day; a slot the new day doesn't offer is cleared. */
   const pickDay = (iso: string) => {
     setDay(iso);
     setClosedPick(false);
     clear('day');
-    if (hour !== null && !slotsFor(iso).includes(hour)) setHour(null);
+    if (hour !== null && (!slotsFor(iso).includes(hour) || taken.has(slotKey(iso, hour)))) setHour(null);
   };
   const [link, setLink] = useState<string | null>(null);
 
@@ -139,6 +153,7 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
   const slotText = (h: number, lang: string, short = false) => clock(h, lang, short);
   const timeText = (lang: string) => (hour === null ? null : slotText(hour, lang));
   const passed = (h: number) => day === today && h * 60 <= nowMinutes();
+  const isTaken = (h: number) => day !== null && taken.has(slotKey(day, h));
 
   const custom = day !== null && !days.includes(day);
   const summary = [
@@ -152,17 +167,48 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
   const toggle = (i: BookingInterest) => setInterests((v) => (v.includes(i) ? v.filter((x) => x !== i) : [...v, i]));
   const clear = (f: Field) => setErrors((e) => e.filter((x) => x !== f));
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (sending) return;
     const bad: Field[] = [];
     const tooSoon = hour !== null && passed(hour);
+    const gone = hour !== null && isTaken(hour);
     if (!day) bad.push('day');
-    if (hour === null || tooSoon) bad.push('time');
+    if (hour === null || tooSoon || gone) bad.push('time');
     if (name.trim().length < 2) bad.push('name');
     if (phone.replace(/\D/g, '').length < 8) bad.push('phone');
     setPastTime(tooSoon);
+    setTakenError(gone);
     setErrors(bad);
-    if (bad.length || !day) return;
+    if (bad.length || !day || hour === null) return;
+
+    // Open the tab now, while the click still counts as the visitor's, then point it at WhatsApp
+    // once the slot is ours. Browsers block tabs opened after a network wait.
+    const tab = ENDPOINT ? window.open('', '_blank') : null;
+    if (ENDPOINT) {
+      setSending(true);
+      const status = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day, hour, name: name.trim(), phone: phone.trim(), interests, locale }),
+      })
+        .then((r) => r.status)
+        .catch(() => 0);
+      setSending(false);
+      // Someone else just took it: grey it out and ask for another time.
+      if (status === 409) {
+        tab?.close();
+        setTaken((s) => new Set(s).add(slotKey(day, hour)));
+        setHour(null);
+        setTakenError(true);
+        setPastTime(false);
+        setErrors(['time']);
+        fetchTaken().then((keys) => setTaken(new Set(keys)));
+        return;
+      }
+      // Any other answer (saved, or the server is unreachable) still sends the booking.
+      if (status === 200) setTaken((s) => new Set(s).add(slotKey(day, hour)));
+    }
 
     // A clean card in the chat, one format for the team whatever language the visitor used.
     // Only WhatsApp's own formatting (*bold*, _italic_, "> " quote bar) and plain characters:
@@ -192,13 +238,16 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
     const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
     setLink(url);
     trackLead('booking_whatsapp', { interests: interests.join(',') || undefined });
-    window.open(url, '_blank', 'noopener');
+    if (tab) {
+      tab.opener = null;
+      tab.location.href = url;
+    } else window.open(url, '_blank', 'noopener');
   };
 
   const error = (f: Field) =>
     errors.includes(f) ? (
       <p id={`booking-${f}-error`} className="mt-2 text-small text-copper-deep" role="alert">
-        {f === 'time' && pastTime ? labels.errors.timePast : f === 'day' && closedPick ? labels.errors.dayClosed : labels.errors[f]}
+        {f === 'time' && takenError ? labels.errors.timeTaken : f === 'time' && pastTime ? labels.errors.timePast : f === 'day' && closedPick ? labels.errors.dayClosed : labels.errors[f]}
       </p>
     ) : null;
   const legend = 'mb-3 flex min-h-tap w-full items-center justify-between gap-4 text-small font-medium';
@@ -317,9 +366,10 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
                     key={h}
                     type="button"
                     aria-pressed={h === hour}
-                    disabled={passed(h)}
+                    disabled={passed(h) || isTaken(h)}
                     onClick={() => {
                       setHour(h);
+                      setTakenError(false);
                       clear('time');
                     }}
                     className={cn(chip(h === hour), 'tabular whitespace-nowrap px-2 py-2 disabled:cursor-not-allowed disabled:opacity-35')}
@@ -397,7 +447,8 @@ export function BookingForm({ labels, whatsapp }: { labels: BookingLabels; whats
               </p>
               <button
                 type="submit"
-                className="group flex min-h-14 w-full items-center justify-between gap-4 rounded-pill bg-ink py-2 pe-2 ps-6 text-body font-medium text-canvas transition-colors duration-(--dur-fast) hover:bg-copper-deep"
+                aria-busy={sending || undefined}
+                className="group flex min-h-14 w-full items-center justify-between gap-4 rounded-pill bg-ink py-2 pe-2 ps-6 text-body font-medium text-canvas transition-colors duration-(--dur-fast) hover:bg-copper-deep aria-busy:opacity-70"
               >
                 <span className="flex items-center gap-3">
                   <WhatsAppMark className="size-5" />

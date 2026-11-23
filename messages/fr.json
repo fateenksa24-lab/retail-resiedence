@@ -289,7 +289,8 @@
         "name": "Veuillez indiquer votre nom.",
         "phone": "Veuillez indiquer un numéro valide.",
         "dayClosed": "Nous sommes fermés le vendredi. Veuillez choisir un autre jour.",
-        "timePast": "Veuillez choisir une heure plus tardive."
+        "timePast": "Veuillez choisir une heure plus tardive.",
+        "timeTaken": "Ce créneau vient d’être réservé. Veuillez en choisir un autre."
       },
       "otherDate": "Autre date",
       "scrollPrev": "Jours précédents",

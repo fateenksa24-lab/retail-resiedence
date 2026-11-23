@@ -57,7 +57,7 @@ export async function BookingPanel() {
               sentBody: t('sentBody'),
               sentAgain: t('sentAgain'),
               sentReset: t('sentReset'),
-              errors: { day: t('errors.day'), dayClosed: t('errors.dayClosed'), time: t('errors.time'), timePast: t('errors.timePast'), name: t('errors.name'), phone: t('errors.phone') },
+              errors: { day: t('errors.day'), dayClosed: t('errors.dayClosed'), time: t('errors.time'), timePast: t('errors.timePast'), timeTaken: t('errors.timeTaken'), name: t('errors.name'), phone: t('errors.phone') },
             }}
           />
         </div>

@@ -14,7 +14,11 @@ const nextConfig: NextConfig = {
   output: onVercel ? undefined : 'export',
   // `.vercel.tsx` holds the admin (CMS), which needs a server.
   pageExtensions: onVercel ? ['tsx', 'ts', 'vercel.ts', 'vercel.tsx'] : ['tsx', 'ts'],
-  env: { NEXT_PUBLIC_ENQUIRY_ENDPOINT: onVercel ? '/api/contact/' : '/contact.php' },
+  env: {
+    NEXT_PUBLIC_ENQUIRY_ENDPOINT: onVercel ? '/api/contact/' : '/contact.php',
+    // Taken visit slots need a server; on static hosting every slot stays open.
+    NEXT_PUBLIC_BOOKING_ENDPOINT: onVercel ? '/api/booking/' : '',
+  },
   trailingSlash: true,
   reactStrictMode: true,
   // Next 16.3 appends agent notes to CLAUDE.md on `next dev`; this project's Claude.md is the client brief.
